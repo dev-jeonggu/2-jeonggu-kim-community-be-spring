@@ -1,5 +1,6 @@
 package com.board.security;
 
+import com.board.entity.auth.JwtUserDetails;
 import com.board.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,23 +36,44 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 // JWT 검증
                 Claims claims = jwtUtil.validateToken(token);
-                String email = claims.getSubject(); // JWT에서 이메일(subject) 추출
+                String email = claims.getSubject();  // 토큰의 subject에서 email 추출
+                Long userIdFromToken = claims.get("userId", Long.class);  // 토큰에서 userId 추출
+                
+                // 요청 경로의 userId 추출
+                String requestUri = request.getRequestURI();  // 예: "/users/3"
+                Long userIdFromPath = extractUserIdFromPath(requestUri);  // 경로에서 userId 추출
+                
+                // 토큰의 userId와 요청 경로의 userId 비교
+                if (userIdFromPath != null && !userIdFromPath.equals(userIdFromToken)) {
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write("Forbidden: You can only modify your own data");
+                    return;
+                }
 
-                // Spring Security 인증 설정
+                // 인증 객체 생성 및 SecurityContextHolder 설정
+                JwtUserDetails userDetails = new JwtUserDetails(userIdFromToken, email);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        email, null, null // 권한 없음
+                		userDetails, null, null
                 );
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
             } catch (Exception e) {
-                // 검증 실패 시 401 응답
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Invalid or expired JWT token");
                 return;
             }
         }
 
-        // 다음 필터로 이동
         filterChain.doFilter(request, response);
     }
+
+    private Long extractUserIdFromPath(String requestUri) {
+        // URL에서 "/users/{id}" 형태의 ID 부분 추출
+        if (requestUri.matches("/users/\\d+")) {
+            return Long.parseLong(requestUri.substring(requestUri.lastIndexOf("/") + 1));
+        }
+        return null;
+    }
+
 }
