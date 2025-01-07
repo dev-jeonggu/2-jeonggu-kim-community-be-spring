@@ -2,7 +2,12 @@ package com.board.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+
+import com.board.entity.User;
+import com.board.entity.auth.JwtUserDetails;
 
 import java.security.Key;
 import java.util.Date;
@@ -21,7 +26,7 @@ public class JwtUtil {
     public String generateToken(Long userId, String email) {
     	String jwt = Jwts.builder()
                 .setSubject(email) // 이메일을 주제로 설정
-                .claim("user_id", userId) // user_id를 클레임에 추가
+                .claim("userId", userId) // user_id를 클레임에 추가
                 .setIssuedAt(new Date()) // 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
                 .signWith(key) // 서명
@@ -48,5 +53,14 @@ public class JwtUtil {
         } catch (JwtException e) {
             throw new IllegalArgumentException("JWT Token is invalid", e);
         }
+    }
+    
+    public static Long getUserIdFromSecurityContext() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JwtUserDetails) {
+        	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return userDetails.getId();
+        }
+        return null;  // 인증 정보가 없을 경우 null 반환
     }
 }
