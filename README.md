@@ -1,1 +1,2 @@
-# 2-jeonggu-kim-community-be-spring
+# project : Jeonggu.kim Community (spring)
+Jeonggu.kim community
