@@ -2,6 +2,8 @@ package com.board.service;
 
 import com.board.entity.User;
 import com.board.repo.UserRepository;
+import com.board.repo.admin.NotificationRepository;
+import com.board.utils.LoggerUtil;
 
 import java.util.Optional;
 
@@ -18,32 +20,58 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // 사용자 조회
+    // NOTE : 사용자 조회
     public Optional<User> findUser(String key, String value, Long userId) {
         return userRepository.findUserByKeyAndValue(key, value, userId);
     }
 
-    // 사용자 추가
-    public int addUser(User user) {
-        return userRepository.addUser(user);
+    // NOTE : 사용자 추가
+    public Long addUser(User user) {
+    	Long result =  0L;
+        // NOTE : 이메일 중복 확인
+        if (userRepository.isEmailOrNicknameDuplicate("email", user.getEmail(), null)) {
+        	LoggerUtil.debug("Email is already in use.");
+        	return result;
+        }
+        
+        // NOTE : 닉네임 중복 확인
+        if (userRepository.isEmailOrNicknameDuplicate("nickname", user.getNickname(), null)) {
+        	LoggerUtil.debug("Nickname is already in use.");
+        	return result;
+        }
+        
+        result = userRepository.addUser(user);
+
+        return result;
     }
 
-    // 사용자 정보 업데이트
+    // NOTE : 사용자 정보 업데이트
     public int updateUser(Long userId, User user) {
-        return userRepository.updateUser(userId, user);
+    	int result = 0;
+    	// NOTE : 닉네임 중복 확인
+        if (userRepository.isEmailOrNicknameDuplicate("nickname", user.getNickname(), null)) {
+        	LoggerUtil.debug("Nickname is already in use.");
+        	return result;
+        }
+        
+        result = userRepository.updateUser(userId, user);
+        if(result > 0) {
+        	notificationRepository.save("UPDATE", "users", "사용자가 수정되었습니다", userId);
+        }
+        return result;
     }
 
-    // 사용자 삭제 및 관련 데이터 삭제
+    // NOTE : 사용자 삭제 및 관련 데이터 삭제
     @Transactional
     public boolean deleteUser(Long userId) {
         try {
-            // 댓글 삭제
+            // NOTE : 댓글 삭제
             userRepository.deleteCommentsByUserId(userId);
 
-            // 게시글 삭제
+            // NOTE : 게시글 삭제
             userRepository.deleteBoardsByUserId(userId);
 
-            // 사용자 삭제
+            // NOTE : 사용자 삭제
             userRepository.deleteUser(userId);
 
             return true;
