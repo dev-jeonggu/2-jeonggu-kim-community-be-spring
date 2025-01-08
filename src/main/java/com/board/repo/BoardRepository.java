@@ -21,7 +21,7 @@ public class BoardRepository {
 
     public Map<String, Object> getBoardById(Long boardId) {
     	String sql = """
-    		    SELECT b.board_id, b.title, b.content, b.reg_dt AS date, b.user_id, b.image_url,
+    		    SELECT b.board_id, b.title, b.content AS boardContent, b.reg_dt AS date, b.user_id, b.image_url,
     		           u.email, u.nickname, u.profile_url,
     		           (SELECT COUNT(*) FROM likes WHERE board_id = b.board_id) AS like_cnt,
     		           (SELECT COUNT(*) FROM comments WHERE board_id = b.board_id) AS comment_cnt,
