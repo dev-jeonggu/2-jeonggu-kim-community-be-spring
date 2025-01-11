@@ -47,6 +47,7 @@ public class Board {
     private String title;        // 제목
     private String content;      // 내용
     private String email;        // 작성자 이메일
+    private String nickname;
     private String imageUrl;     // 이미지 URL
     private String imageNm;      // 이미지 이름
     @Nullable
@@ -58,11 +59,12 @@ public class Board {
     public Board() {}
 
     // 생성자 (필요한 경우 추가)
-    public Board(Long boardId, String title, String content, String email, String imageUrl, String imageNm, LocalDateTime regDt, LocalDateTime chgDt) {
+    public Board(Long boardId, String title, String content, String email, String nickname, String imageUrl, String imageNm, LocalDateTime regDt, LocalDateTime chgDt) {
         this.boardId = boardId;
         this.title = title;
         this.content = content;
         this.email = email;
+        this.nickname = nickname;
         this.imageUrl = imageUrl;
         this.imageNm = imageNm;
         this.regDt = regDt;

@@ -11,8 +11,17 @@ public class User {
     private String profileUrl;
     private LocalDateTime regDt; // 등록일시
     private LocalDateTime chgDt; // 수정일시
+    private String isAdmin;
 
-    // Getters and Setters
+    public String getIsAdmin() {
+		return isAdmin;
+	}
+
+	public void setIsAdmin(String isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+
+	// Getters and Setters
     public Long getId() {
         return id;
     }
