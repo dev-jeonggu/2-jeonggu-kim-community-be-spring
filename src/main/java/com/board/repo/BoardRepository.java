@@ -77,7 +77,8 @@ public class BoardRepository {
     		    SELECT b.board_id, b.title, b.content, b.reg_dt AS date, b.user_id,
     		           u.nickname, u.profile_url,
     		           (SELECT COUNT(*) FROM likes WHERE board_id = b.board_id) AS like_cnt,
-    		           (SELECT COUNT(*) FROM comments WHERE board_id = b.board_id) AS comment_cnt
+    		           (SELECT COUNT(*) FROM comments WHERE board_id = b.board_id) AS comment_cnt,
+                   	   (SELECT COUNT(*) FROM boardview WHERE board_id = b.board_id) AS view_cnt
     		    FROM boards b
     		    INNER JOIN users u ON b.user_id = u.user_id
     		    WHERE (? IS NULL OR b.title LIKE CONCAT('%', ?, '%'))
