@@ -40,6 +40,7 @@ public class BoardService {
 				request.getImageUrl(), request.getImageNm());
 
 		if (result > 0) {
+			notificationRepository.save("CREATE", "boards", "게시글이 등록되었습니다 : " + request.getTitle(),
 					request.getUserId());
 
 			return new BoardResponse("Board added successfully");
@@ -65,6 +66,8 @@ public class BoardService {
 				request.getImageNm(), request.getUserId());
 
 		if (result > 0) {
+			notificationRepository.save("UPDATE", "boards", "게시글이 수정되었습니다 : " + request.getTitle(),
+					request.getUserId());
 			return new BoardResponse("Board updated successfully");
 		} else {
 			throw new RuntimeException("Failed to update board");
@@ -74,6 +77,10 @@ public class BoardService {
 	// NOTE : 게시글 삭제
 	public void deleteBoard(Long boardId, Long userId) {
 		int result = boardRepository.deleteBoard(boardId, userId);
+		if (result > 0) {
+			notificationRepository.save("DELETE", "boards", "게시글이 삭제되었습니다", userId);
+		} else {
 			LoggerUtil.debug("Board not found");
+		}
 	}
 }

@@ -28,7 +28,7 @@ public class NotificationController {
         return ResponseEntity.ok("알림이 생성되었습니다.");
     }
 
- // NOTE : 특정 사용자 알림 조회 API
+ // NOTE : 전체 사용자 알림 조회 API
     @GetMapping
     public ResponseEntity<List<Notification>> getNotificationsByUserId() {
         return ResponseEntity.ok(notificationService.getNotificationsByAllUser());

@@ -13,10 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
+	@Autowired
+	private NotificationRepository notificationRepository;
+	
     private final UserRepository userRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -44,7 +46,6 @@ public class UserService {
 
         return result;
     }
-
     // NOTE : 사용자 정보 업데이트
     public int updateUser(Long userId, User user) {
     	int result = 0;
@@ -74,7 +75,9 @@ public class UserService {
             // NOTE : 사용자 삭제
             userRepository.deleteUser(userId);
 
-            return true;
+        	notificationRepository.save("DELETE", "users", "사용자가 삭제되었습니다", userId);
+            
+        	return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
