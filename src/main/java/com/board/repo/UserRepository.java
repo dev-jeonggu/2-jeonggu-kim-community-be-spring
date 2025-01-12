@@ -23,15 +23,15 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
     
     // NOTE : 1. 사용자 조회
-    public Optional<User> findUserByKeyAndValue(String key, String value, Long userId) {
-        String sql = "SELECT user_id, email, password, nickname, profile_url FROM users WHERE " +
+    public List<User> findUserByKeyAndValue(String key, String value, Long userId) {
+        String sql = "SELECT user_id, email, password, nickname, profile_url, ifnull(is_admin,'N') AS isAdmin FROM users WHERE " +
                      key + " = ? " +
                      (userId != null ? "AND user_id != ? " : "");
-
+        
         Object[] params = userId != null ? new Object[]{value, userId} : new Object[]{value};
 
         List<User> users = jdbcTemplate.query(sql, params, new UserRowMapper());
-        return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
+        return users;
     }
 
     // NOTE : 2. 사용자 추가

@@ -23,10 +23,11 @@ public class JwtUtil {
     private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간
 
     // JWT 생성 메서드
-    public String generateToken(Long userId, String email) {
+    public String generateToken(Long userId, String email, String isAdmin) {
     	String jwt = Jwts.builder()
                 .setSubject(email) // 이메일을 주제로 설정
                 .claim("userId", userId) // user_id를 클레임에 추가
+                .claim("isAdmin", isAdmin) // user_id를 클레임에 추가
                 .setIssuedAt(new Date()) // 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
                 .signWith(key) // 서명
