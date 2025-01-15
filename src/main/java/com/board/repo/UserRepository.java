@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
@@ -22,7 +23,7 @@ public class UserRepository {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     
-    // NOTE : 1. 사용자 조회
+    // NOTE :사용자 조회
     public List<User> findUserByKeyAndValue(String key, String value, Long userId) {
         String sql = "SELECT user_id, email, password, nickname, profile_url, ifnull(is_admin,'N') AS isAdmin FROM users WHERE " +
                      key + " = ? " +
@@ -33,8 +34,16 @@ public class UserRepository {
         List<User> users = jdbcTemplate.query(sql, params, new UserRowMapper());
         return users;
     }
+    
+    // NOTE : 사용자 조회
+    public Map<String,Object> findUserByuserId(Long userId) {
+        String sql = "SELECT email, nickname, profile_url FROM users WHERE user_id = ? ";
+        
+        return jdbcTemplate.queryForMap(sql, userId);
+    }
 
-    // NOTE : 2. 사용자 추가
+    
+    // NOTE : 사용자 추가
     public Long addUser(User user) {
         String sql = "INSERT INTO users (email, password, nickname, profile_url, reg_dt) VALUES (?, ?, ?, ?, now())";
 
@@ -54,7 +63,7 @@ public class UserRepository {
         return userId;
     }
 
-    // NOTE : 3. 사용자 정보 업데이트
+    // NOTE : 사용자 정보 업데이트
     public int updateUser(Long userId, User user) {
         String sql = "UPDATE users SET " +
                      "email = COALESCE(?, email), " +
@@ -66,21 +75,21 @@ public class UserRepository {
         return jdbcTemplate.update(sql, user.getEmail(), user.getPassword(), user.getNickname(), user.getProfileUrl(), userId);
     }
 
-    // NOTE : 4. 사용자 삭제
+    // NOTE : 사용자 삭제
     public int deleteUser(Long userId) {
         String sql = "DELETE FROM users WHERE user_id = ?";
         
         return jdbcTemplate.update(sql, userId);
     }
 
-    // NOTE : 5. 게시글 삭제
+    // NOTE : 게시글 삭제
     public int deleteBoardsByUserId(Long userId) {
         String sql = "DELETE FROM boards WHERE user_id = ?";
         
         return jdbcTemplate.update(sql, userId);
     }
 
-    // NOTE : 6. 댓글 삭제
+    // NOTE : 댓글 삭제
     public int deleteCommentsByUserId(Long userId) {
         String sql = "DELETE FROM comments WHERE user_id = ?";
         
@@ -91,7 +100,7 @@ public class UserRepository {
         String sql = "SELECT COUNT(*) FROM users WHERE " + key + " = ? " + (userId != null ? "AND user_id != ?" : "");
         Object[] params = userId != null ? new Object[]{value, userId} : new Object[]{value};
         Integer count = jdbcTemplate.queryForObject(sql, params, Integer.class);
-        return count != null && count > 0;  // 중복 시 true 반환
+        return count != null && count > 0;
     }
     
     // NOTE : RowMapper 구현
