@@ -7,8 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import com.board.dto.admin.NotificationRequest;
 import com.board.entity.admin.Notification;
 import com.board.service.admin.NotificationService;
+import com.board.utils.JwtUtil;
+import com.board.utils.ResponseUtil;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/notifications")
@@ -24,19 +27,26 @@ public class NotificationController {
     // NOTE : 알림 생성 API
     @PostMapping
     public ResponseEntity<String> createNotification(@RequestBody NotificationRequest request) {
-        notificationService.createNotification(request.getEventType(), request.getRequestModule(), request.getContent(), request.getUserId());
+        notificationService.createNotification(request.getEventType(), request.getRequestModule(), request.getContent(), request.getContentDetail(), request.getUserId(), request.getEventId());
         return ResponseEntity.ok("알림이 생성되었습니다.");
     }
 
- // NOTE : 전체 사용자 알림 조회 API
+ // NOTE : 알림 조회 API
     @GetMapping
-    public ResponseEntity<List<Notification>> getNotificationsByUserId() {
-        return ResponseEntity.ok(notificationService.getNotificationsByAllUser());
+    public ResponseEntity<?> getNotificationsByUserId() {
+        String isAdmin = JwtUtil.getIsAdminFromSecurityContext();
+        Long userId = JwtUtil.getUserIdFromSecurityContext();
+        
+        if(isAdmin.equals("Y")) {
+        	return ResponseEntity.ok(notificationService.getNotificationsByAllUser());        	
+        }else {
+            return ResponseEntity.ok(notificationService.getNotificationsByUserId(userId));
+        }
     }
     
     // NOTE : 특정 사용자 알림 조회 API
     @GetMapping("/{userId}")
-    public ResponseEntity<List<Notification>> getNotificationsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<?> getNotificationsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(notificationService.getNotificationsByUserId(userId));
     }
 
@@ -47,9 +57,17 @@ public class NotificationController {
     }
 
     // NOTE : 알림 읽음 처리 API
-    @PutMapping("/read/{notificationId}")
-    public ResponseEntity<String> markAsRead(@PathVariable Long notificationId) {
-        notificationService.markAsRead(notificationId);
-        return ResponseEntity.ok("알림이 읽음 처리되었습니다.");
+    @PutMapping("/read")
+    public ResponseEntity<?> markAsRead(@RequestBody NotificationRequest request) {
+        Long userId = JwtUtil.getUserIdFromSecurityContext();
+        String isAdmin = JwtUtil.getIsAdminFromSecurityContext();
+        
+        if(isAdmin.equals("Y")) {
+            notificationService.markAsAdminRead(request.getNotificationIds(), userId);   	
+        }else {
+            notificationService.markAsRead(request.getNotificationIds(), userId);
+        }
+        notificationService.markAsRead(request.getNotificationIds(), userId);
+        return ResponseEntity.ok(ResponseUtil.successResponse(null));
     }
 }

@@ -6,6 +6,7 @@ import com.board.entity.admin.Notification;
 import com.board.repo.admin.NotificationRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class NotificationService {
@@ -17,17 +18,17 @@ public class NotificationService {
     }
 
     // 알림 생성
-    public void createNotification(String eventType, String request_module, String content, Long userId) {
-        notificationRepository.save(eventType, request_module, content, userId);
+    public void createNotification(String eventType, String request_module, String content, String content_detail, Long userId, Long eventId) {
+        notificationRepository.save(eventType, request_module, content, content_detail, userId, eventId);
     }
 
     // 사용자별 알림 조회
-    public List<Notification> getNotificationsByUserId(Long userId) {
+    public List<Map<String, Object>> getNotificationsByUserId(Long userId) {
         return notificationRepository.findByUserId(userId);
     }
 
  // 사용자별 알림 조회
-    public List<Notification> getNotificationsByAllUser() {
+    public List<Map<String, Object>> getNotificationsByAllUser() {
         return notificationRepository.findByAllUser();
     }
     
@@ -37,7 +38,21 @@ public class NotificationService {
     }
 
     // 알림 읽음 처리
-    public void markAsRead(Long notificationId) {
-        notificationRepository.markAsRead(notificationId);
+    public boolean markAsRead(String notificationIds, Long userId) {
+    	int result =  notificationRepository.markAsRead(notificationIds);
+        if(result > 0) {
+            notificationRepository.save("UPDATE", "notifications", "모든 알림을 읽음 처리 했습니다.", "", userId, null);
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean markAsAdminRead(String notificationIds, Long userId) {
+    	int result =  notificationRepository.markAsAdminRead(notificationIds);
+        if(result > 0) {
+            notificationRepository.save("UPDATE", "notifications", "모든 알림을 읽음 처리 했습니다.", "", userId, null);
+            return true;
+        }
+        return false;
     }
 }
