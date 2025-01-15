@@ -23,11 +23,12 @@ public class JwtUtil {
     private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간
 
     // JWT 생성 메서드
-    public String generateToken(Long userId, String email, String isAdmin) {
+    public String generateToken(Long userId, String email, String isAdmin, String nickname) {
     	String jwt = Jwts.builder()
                 .setSubject(email) // 이메일을 주제로 설정
                 .claim("userId", userId) // user_id를 클레임에 추가
                 .claim("isAdmin", isAdmin) // user_id를 클레임에 추가
+                .claim("nickname", nickname) // user_id를 클레임에 추가
                 .setIssuedAt(new Date()) // 발행 시간
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
                 .signWith(key) // 서명
@@ -61,6 +62,24 @@ public class JwtUtil {
                 SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JwtUserDetails) {
         	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userDetails.getId();
+        }
+        return null;  // 인증 정보가 없을 경우 null 반환
+    }
+    
+    public static String getIsAdminFromSecurityContext() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JwtUserDetails) {
+        	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return userDetails.getIsAdmin();
+        }
+        return null;  // 인증 정보가 없을 경우 null 반환
+    }
+    
+    public static String getNicknameFromSecurityContext() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JwtUserDetails) {
+        	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return userDetails.getNickname();
         }
         return null;  // 인증 정보가 없을 경우 null 반환
     }
