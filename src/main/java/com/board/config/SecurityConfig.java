@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -29,10 +30,6 @@ public class SecurityConfig {
             .and()
             .authorizeRequests()
             	.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청 허용
-                .antMatchers(HttpMethod.POST, "/users/**").permitAll() 
-                .antMatchers(HttpMethod.GET, "/users/**").authenticated()
-                .antMatchers(HttpMethod.PUT, "/users/**").authenticated()
-                .antMatchers(HttpMethod.DELETE, "/users/**").authenticated()
                 .antMatchers(HttpMethod.POST, "/boards/**").authenticated() 
                 .antMatchers(HttpMethod.GET, "/boards/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/boards/**").authenticated()
@@ -40,6 +37,13 @@ public class SecurityConfig {
                 .antMatchers("/notifications/**").authenticated()
                 .antMatchers("/comments/**").authenticated()
                 .anyRequest().authenticated()
+            .antMatchers(HttpMethod.POST, "/users/**").permitAll() 
+            .antMatchers(HttpMethod.GET, "/users/check").permitAll() 
+            .antMatchers(HttpMethod.GET, "/users/**").authenticated()
+            .antMatchers(HttpMethod.PATCH, "/users/**").authenticated()
+            .antMatchers(HttpMethod.PUT, "/users/**").authenticated()
+            .antMatchers(HttpMethod.DELETE, "/users/**").authenticated()
+            
             .and()
             .formLogin().disable();
 
