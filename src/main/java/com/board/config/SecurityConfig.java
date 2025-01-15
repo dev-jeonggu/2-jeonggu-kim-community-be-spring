@@ -29,10 +29,7 @@ public class SecurityConfig {
             .cors() // CORS 활성화
             .and()
             .authorizeRequests()
-            	.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청 허용
-                .antMatchers("/notifications/**").authenticated()
-                .antMatchers("/comments/**").authenticated()
-                .anyRequest().authenticated()
+        	.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청 허용
             .antMatchers(HttpMethod.POST, "/users/**").permitAll() 
             .antMatchers(HttpMethod.GET, "/users/check").permitAll() 
             .antMatchers(HttpMethod.GET, "/users/**").authenticated()
@@ -46,7 +43,14 @@ public class SecurityConfig {
             .antMatchers(HttpMethod.PUT, "/boards/**").authenticated()
             .antMatchers(HttpMethod.DELETE, "/boards/**").authenticated()
 
+            .antMatchers(HttpMethod.GET, "/auth/**").authenticated()
+            .antMatchers(HttpMethod.POST, "/auth/**").permitAll()
+            .antMatchers("/auth/**").authenticated()
+            .antMatchers("/notifications/**").authenticated()
+            .antMatchers("/comments/**").authenticated()
+            .anyRequest().permitAll()
             .and()
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .formLogin().disable();
 
         return http.build();
