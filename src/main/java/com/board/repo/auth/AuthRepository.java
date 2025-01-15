@@ -25,7 +25,7 @@ public class AuthRepository {
     private JdbcTemplate jdbcTemplate;
 
     public Map<String, Object> findByEmail(String email) {
-        String sql = "SELECT user_id, nickname, password, email, profile_url FROM users WHERE email = ?";
+        String sql = "SELECT user_id, nickname, password, email, profile_url, ifnull(is_admin,'N') AS isAdmin FROM users WHERE email = ?";
         return jdbcTemplate.queryForMap(sql, email);
     }
 }
