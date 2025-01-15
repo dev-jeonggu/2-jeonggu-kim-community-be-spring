@@ -30,10 +30,6 @@ public class SecurityConfig {
             .and()
             .authorizeRequests()
             	.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // 모든 OPTIONS 요청 허용
-                .antMatchers(HttpMethod.POST, "/boards/**").authenticated() 
-                .antMatchers(HttpMethod.GET, "/boards/**").permitAll()
-                .antMatchers(HttpMethod.PUT, "/boards/**").authenticated()
-                .antMatchers(HttpMethod.DELETE, "/boards/**").authenticated()
                 .antMatchers("/notifications/**").authenticated()
                 .antMatchers("/comments/**").authenticated()
                 .anyRequest().authenticated()
@@ -44,6 +40,12 @@ public class SecurityConfig {
             .antMatchers(HttpMethod.PUT, "/users/**").authenticated()
             .antMatchers(HttpMethod.DELETE, "/users/**").authenticated()
             
+            .antMatchers(HttpMethod.POST, "/boards/**").authenticated() 
+            .antMatchers(HttpMethod.GET, "/boards/**").permitAll()
+            .antMatchers(HttpMethod.PATCH, "/boards/**").authenticated()
+            .antMatchers(HttpMethod.PUT, "/boards/**").authenticated()
+            .antMatchers(HttpMethod.DELETE, "/boards/**").authenticated()
+
             .and()
             .formLogin().disable();
 
