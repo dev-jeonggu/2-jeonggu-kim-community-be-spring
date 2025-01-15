@@ -6,13 +6,13 @@ import java.util.Map;
 
 public class BoardListResponse {
     private List<Map<String, Object>> data;
-    private boolean hasNext;
+    private boolean hasMore;
 
     public BoardListResponse() {}
 
-    public BoardListResponse(List<Map<String, Object>> boards, boolean hasNext) {
+    public BoardListResponse(List<Map<String, Object>> boards, boolean hasMore) {
         this.data = boards;
-        this.hasNext = hasNext;
+        this.hasMore = hasMore;
     }
 
     // NOTE : Getter와 Setter
@@ -24,11 +24,11 @@ public class BoardListResponse {
         this.data = boards;
     }
 
-    public boolean isHasNext() {
-        return hasNext;
+    public boolean isHasMore() {
+        return hasMore;
     }
 
-    public void setHasNext(boolean hasNext) {
-        this.hasNext = hasNext;
+    public void setHasMore(boolean hasMore) {
+        this.hasMore = hasMore;
     }
 }
