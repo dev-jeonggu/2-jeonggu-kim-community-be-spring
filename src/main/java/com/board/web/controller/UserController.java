@@ -4,6 +4,7 @@ import com.board.dto.BoardResponse;
 import com.board.entity.User;
 import com.board.service.UserService;
 import com.board.utils.JwtUtil;
+import com.board.utils.ResponseUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,6 +56,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
     
+    @GetMapping
+    public ResponseEntity<?> findUser() {
+    	Long userId = JwtUtil.getUserIdFromSecurityContext();
+    	Map<String, Object> map = userService.findUser(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(map);
+    }
+    
+    
     @PostMapping("/check")
     public ResponseEntity<?> checkUser(HttpServletRequest request, Map<String, String> requestBody) {
     	Long userId = JwtUtil.getUserIdFromSecurityContext();
@@ -65,30 +75,30 @@ public class UserController {
     }
     // NOTE : 사용자 추가
     @PostMapping
-    public ResponseEntity<String> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@RequestBody User user) {
     	boolean result = userService.addUser(user);
         if (result) {
-            return ResponseEntity.ok("User added successfully!");
+            return ResponseEntity.ok(ResponseUtil.successResponse("User added successfully!"));
         } else {
-            return ResponseEntity.status(500).body("Failed to add user.");
+            return ResponseEntity.status(500).body(ResponseUtil.errorResponse(null));
         }
     }
 
     // NOTE : 사용자 정보 업데이트
-    @PutMapping("/{userId}")
-    public ResponseEntity<String> updateUser(HttpServletRequest request, @RequestBody User user) {
+    @PatchMapping
+    public ResponseEntity<?> updateUser(HttpServletRequest request, @RequestBody User user) {
     	Long userId = JwtUtil.getUserIdFromSecurityContext();
 
-    	int rowsAffected = userService.updateUser(userId, user);
-        if (rowsAffected > 0) {
-            return ResponseEntity.ok("User updated successfully!");
+    	Map<String,Object> rowsAffected = userService.updateUser(userId, user);
+        if (rowsAffected!= null) {
+            return ResponseEntity.ok(rowsAffected);
         } else {
             return ResponseEntity.status(404).body("User not found.");
         }
     }
 
     // NOTE : 사용자 삭제 및 관련 데이터 삭제
-    @DeleteMapping("/{userId}")
+    @DeleteMapping
     public ResponseEntity<String> deleteUser(HttpServletRequest request) {
     	Long userId = JwtUtil.getUserIdFromSecurityContext();
         boolean success = userService.deleteUser(userId);
