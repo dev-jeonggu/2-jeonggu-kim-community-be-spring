@@ -50,6 +50,13 @@ public class UserService {
         return outerResponse;
     }
 
+    // NOTE : 사용자 조회
+    public Map<String, Object> findUser(Long userId) {
+        Map<String,Object> user = userRepository.findUserByuserId(userId);
+
+        return ResponseUtil.successResponse(user);
+    }
+    
     // NOTE : 사용자 추가
     public boolean addUser(User user) {
         // 이메일 중복 확인
@@ -71,26 +78,34 @@ public class UserService {
         Long result = userRepository.addUser(user);
         
         if (result > 0) {
-            notificationRepository.save("INSERT", "users", "사용자가 추가되었습니다", result);
+            notificationRepository.save("INSERT", "users", "사용자가 추가되었습니다.", "", result, null);
             return true;
         } else {
             return false;
         }
     }
     // NOTE : 사용자 정보 업데이트
-    public int updateUser(Long userId, User user) {
-    	int result = 0;
-    	// NOTE : 닉네임 중복 확인
-        if (userRepository.isEmailOrNicknameDuplicate("nickname", user.getNickname(), null)) {
-        	LoggerUtil.debug("Nickname is already in use.");
-        	return result;
+    public Map<String, Object> updateUser(Long userId, User user) {
+        int result = 0;
+        // NOTE: 닉네임 중복 확인
+        if (userRepository.isEmailOrNicknameDuplicate("nickname", user.getNickname(), userId)) {
+            LoggerUtil.debug("Nickname is already in use.");
+            return null;
         }
-        
+        // 사용자 추가 로직
+        String decodedPassword = passwordUtil.decodeBase64(user.getPassword());
+        String encodedPassword = passwordUtil.encodePassword(decodedPassword);
+        user.setPassword(encodedPassword);
         result = userRepository.updateUser(userId, user);
-        if(result > 0) {
-        	notificationRepository.save("UPDATE", "users", "사용자가 수정되었습니다", userId);
+        if (result > 0) {
+            notificationRepository.save("UPDATE", "users", "사용자가 수정되었습니다.", "", userId, null);
         }
-        return result;
+
+        // Map 객체를 생성하여 반환
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("token", encodedPassword);
+        
+        return ResponseUtil.successResponse(responseMap);
     }
 
     // NOTE : 사용자 삭제 및 관련 데이터 삭제
@@ -106,7 +121,7 @@ public class UserService {
             // NOTE : 사용자 삭제
             userRepository.deleteUser(userId);
 
-        	notificationRepository.save("DELETE", "users", "사용자가 삭제되었습니다", userId);
+        	notificationRepository.save("DELETE", "users", "사용자가 삭제되었습니다.", "", userId, null);
             
         	return true;
         } catch (Exception e) {
