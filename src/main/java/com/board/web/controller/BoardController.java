@@ -10,6 +10,9 @@ import com.board.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.URI;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,7 +44,7 @@ public class BoardController {
         @RequestParam(defaultValue = "") String searchValue
     ) {
         try {
-            BoardListResponse response = boardService.getBoardList(currentPage, searchKey, searchValue);
+            Map<String,Object> response = boardService.getBoardList(currentPage, searchKey, searchValue);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error fetching board list", e);
@@ -51,7 +55,8 @@ public class BoardController {
     @PostMapping
     public ResponseEntity<?> addBoard(HttpServletRequest request, @RequestBody BoardRequest boardRequest) {
         try {
-            BoardResponse response = boardService.addBoard(boardRequest);
+        	Long userId = JwtUtil.getUserIdFromSecurityContext();
+        	Map<String, Object> response = boardService.addBoard(boardRequest, userId);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding board post");
@@ -59,14 +64,33 @@ public class BoardController {
     }
 
     @GetMapping("/{boardId}")
-    public ResponseEntity<?> getBoardInfo(@PathVariable Long boardId) {
+    public ResponseEntity<?> getBoardInfo(@PathVariable Long boardId, HttpServletRequest request) {
         try {
-            BoardResponse response = boardService.getBoardInfo(boardId);
+            // JWT에서 사용자 ID 가져오기
+            Long userId = JwtUtil.getUserIdFromSecurityContext();
+            
+            // Header에서 CurrentPage 가져오기
+            String referrer = request.getHeader("CurrentPage");
+            String url = null;
+            if (referrer != null) {
+                try {
+                    URI referrerUri = new URI(referrer);
+                    url = referrerUri.getPath().split("/")[1]; // URL에서 첫 번째 경로 추출
+                } catch (Exception e) {
+                    System.err.println("Invalid referrer URL: " + referrer);
+                }
+            }
+            // 게시글 정보 가져오기
+            Map<String, Object> response = boardService.getBoardInfo(boardId, userId, url);
+
             return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Board not found");
+            System.err.println("Error fetching board info: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "server error", "data", null));
         }
     }
+
 
     @PutMapping("/{boardId}")
     public ResponseEntity<?> editBoard(HttpServletRequest request,
@@ -76,7 +100,7 @@ public class BoardController {
         	Long userId = JwtUtil.getUserIdFromSecurityContext();
         	boardRequest.setUserId(userId);
         	
-            BoardResponse response = boardService.editBoard(boardId, boardRequest);
+        	Map<String, Object> response = boardService.editBoard(boardId, boardRequest);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating board post");
@@ -91,6 +115,20 @@ public class BoardController {
             return ResponseEntity.ok("success");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting board");
+        }
+    }
+    
+    @PatchMapping("/view/{boardId}")
+    public ResponseEntity<?> addviewBoard(HttpServletRequest request, @PathVariable Long boardId
+    ) {
+        try {
+        	Long userId = JwtUtil.getUserIdFromSecurityContext();
+        	
+            int result = boardService.addViewBoard(boardId, userId);
+        	return ResponseEntity.ok(result);            	
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating board post");
         }
     }
 }
