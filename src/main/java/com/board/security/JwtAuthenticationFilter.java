@@ -27,7 +27,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-
+        String requestUri = request.getRequestURI();                
+    	if (requestUri.startsWith("/auth/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+            
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
@@ -51,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 // 인증 객체 생성 및 SecurityContextHolder 설정
-                JwtUserDetails userDetails = new JwtUserDetails(userIdFromToken, email);
+                JwtUserDetails userDetails = new JwtUserDetails(userIdFromToken, email, isAdmin, nickname);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 		userDetails, null, null
                 );
