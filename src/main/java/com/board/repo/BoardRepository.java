@@ -86,10 +86,10 @@ public class BoardRepository {
     }
 
     public int deleteBoard(Long boardId, Long userId) {
-        String sql = "DELETE FROM boardview WHERE board_id = ?";
+        String sql = "DELETE FROM boards WHERE board_id = ? AND user_id = ?";
         
         
-        return jdbcTemplate.update(sql, boardId);
+        return jdbcTemplate.update(sql, boardId, userId);
     }
 
     public int addViewBoard(Long boardId, Long userId) {
@@ -171,7 +171,6 @@ public class BoardRepository {
             WHERE b.board_id = ?
         """;
         
-        System.out.println("url : " + url);
         if (!url.equals("boardInfo")) {
         	sql += " AND b.user_id = ?";
             return jdbcTemplate.queryForMap(sql, userId, boardId, boardId, userId);

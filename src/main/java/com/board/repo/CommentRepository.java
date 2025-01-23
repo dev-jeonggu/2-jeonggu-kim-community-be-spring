@@ -43,7 +43,6 @@ public class CommentRepository {
 
     // NOTE : 특정 게시글의 댓글 가져오기
     public List<Map<String, Object>> getCommentsByBoardId(Long boardId, Long userId) {
-    	System.out.println(userId);
         String sql = "SELECT " +
                      "b.board_id AS board_id, " +
                      "u.profile_url AS profileUrl, " +
@@ -69,6 +68,14 @@ public class CommentRepository {
         return jdbcTemplate.update(sql, commentId, userId);
     }
 
+
+    // NOTE : 댓글 전체 삭제
+    public int deleteAllComment(Long boardId) {
+        String sql = "DELETE FROM comments WHERE board_id = ?";
+        
+        return jdbcTemplate.update(sql, boardId);
+    }
+    
     // NOTE : 댓글 수정
     public int updateComment(Long commentId, String newContent, Long userId) {
         String sql = "UPDATE comments SET content = ?, chg_dt = NOW() WHERE comment_id = ? and user_id = ?";
