@@ -80,6 +80,7 @@ public class BoardController {
                     System.err.println("Invalid referrer URL: " + referrer);
                 }
             }
+            
             // 게시글 정보 가져오기
             Map<String, Object> response = boardService.getBoardInfo(boardId, userId, url);
 
@@ -111,7 +112,7 @@ public class BoardController {
     public ResponseEntity<?> deleteBoard(HttpServletRequest request, @PathVariable Long boardId) {
         try {
         	Long userId = JwtUtil.getUserIdFromSecurityContext();
-            boardService.deleteBoard(boardId, userId);
+            boardService.deleteBoardWithComments(boardId, userId);
             return ResponseEntity.ok("success");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting board");

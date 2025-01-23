@@ -54,6 +54,15 @@ public class CommentService {
     }
 
     // NOTE : 댓글 삭제
+    public boolean deleteAllComment(Long boardId, Long userId) {
+        int result = commentRepository.deleteAllComment(boardId);
+        if(result > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    // NOTE : 모든 댓글 삭제
     public boolean deleteComment(Long commentId, Long userId) {
         int result = commentRepository.deleteComment(commentId, userId);
         if(result > 0) {
@@ -62,7 +71,7 @@ public class CommentService {
         }
         return false;
     }
-
+    
     // NOTE : 댓글 수정
     public boolean updateComment(Long commentId, String newContent, Long userId) {
         int result = commentRepository.updateComment(commentId, newContent, userId);
