@@ -63,9 +63,8 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
     
-    
     @PostMapping("/check")
-    public ResponseEntity<?> checkUser(HttpServletRequest request, Map<String, String> requestBody) {
+    public ResponseEntity<?> checkUser(HttpServletRequest request, @RequestBody Map<String, String> requestBody) {
     	Long userId = JwtUtil.getUserIdFromSecurityContext();
     	String key = requestBody.get("key");
     	String value = requestBody.get("value");
@@ -73,6 +72,7 @@ public class UserController {
     	Map<String, Object> map = userService.findUser(key, value, userId);
         return ResponseEntity.status(HttpStatus.OK).body(map);
     }
+    
     // NOTE : 사용자 추가
     @PostMapping
     public ResponseEntity<?> addUser(@RequestBody User user) {
