@@ -88,7 +88,11 @@ public class UserController {
     @PatchMapping
     public ResponseEntity<?> updateUser(HttpServletRequest request, @RequestBody User user) {
     	Long userId = JwtUtil.getUserIdFromSecurityContext();
-
+    	String isAdmin = JwtUtil.getIsAdminFromSecurityContext();
+    	String email = JwtUtil.getEmailFromSecurityContext();
+    	user.setIsAdmin(isAdmin);
+    	user.setEmail(email);
+    	
     	Map<String,Object> rowsAffected = userService.updateUser(userId, user);
         if (rowsAffected!= null) {
             return ResponseEntity.ok(rowsAffected);
