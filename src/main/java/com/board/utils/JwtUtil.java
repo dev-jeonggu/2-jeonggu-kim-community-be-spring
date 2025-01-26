@@ -83,4 +83,13 @@ public class JwtUtil {
         }
         return null;  // 인증 정보가 없을 경우 null 반환
     }
+    
+    public static String getEmailFromSecurityContext() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null &&
+                SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof JwtUserDetails) {
+        	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return userDetails.getEmail();
+        }
+        return null;  // 인증 정보가 없을 경우 null 반환
+    }
 }
