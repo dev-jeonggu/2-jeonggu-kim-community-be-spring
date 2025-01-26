@@ -71,8 +71,8 @@ public class BoardController {
             
             // Header에서 CurrentPage 가져오기
             String referrer = request.getHeader("CurrentPage");
-            String url = null;
-            if (referrer != null) {
+            String url = "";
+            if (referrer != null && !referrer.equals("")) {
                 try {
                     URI referrerUri = new URI(referrer);
                     url = referrerUri.getPath().split("/")[1]; // URL에서 첫 번째 경로 추출
