@@ -53,7 +53,7 @@ public class CommentRepository {
                      "c.reg_dt, " +
                      "c.chg_dt, " +
                      "CASE WHEN c.user_id = ? THEN TRUE ELSE FALSE END AS isAuthor, " +
-                     "CASE WHEN c.chg_dt IS NOT NULL THEN TRUE ELSE FALSE END AS isChanged " +
+                     "CASE WHEN c.chg_dt IS NOT NULL THEN TRUE ELSE FALSE END AS isChange " +
                      "FROM boards b " +
                      "INNER JOIN comments c ON b.board_id = c.board_id " +
                      "INNER JOIN users u ON c.user_id = u.user_id " +
