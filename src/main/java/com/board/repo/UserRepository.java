@@ -72,7 +72,12 @@ public class UserRepository {
                      "profile_url = COALESCE(?, profile_url) " +
                      "WHERE user_id = ?";
 
-        return jdbcTemplate.update(sql, user.getEmail(), user.getPassword(), user.getNickname(), user.getProfileUrl(), userId);
+        String email = (user.getEmail() != null && !user.getEmail().isEmpty()) ? user.getEmail() : null;
+        String password = (user.getPassword() != null && !user.getPassword().isEmpty()) ? user.getPassword() : null;
+        String nickname = (user.getNickname() != null && !user.getNickname().isEmpty()) ? user.getNickname() : null;
+        String profileUrl = (user.getProfileUrl() != null && !user.getProfileUrl().isEmpty()) ? user.getProfileUrl() : null;
+
+        return jdbcTemplate.update(sql, email, password, nickname, profileUrl, userId);
     }
 
     // NOTE : 사용자 삭제

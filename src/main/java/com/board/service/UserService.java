@@ -6,6 +6,7 @@ import com.board.repo.admin.NotificationRepository;
 import com.board.utils.LoggerUtil;
 import com.board.utils.PasswordUtil;
 import com.board.utils.ResponseUtil;
+import com.board.utils.JwtUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,11 +26,13 @@ public class UserService {
 	
     private final UserRepository userRepository;
     private final PasswordUtil passwordUtil;
+    private final JwtUtil jwtUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordUtil passwordUtil) {
+    public UserService(UserRepository userRepository, PasswordUtil passwordUtil, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordUtil = passwordUtil;
+        this.jwtUtil = jwtUtil;
     }
 
     // NOTE : 사용자 조회
@@ -87,23 +90,37 @@ public class UserService {
     // NOTE : 사용자 정보 업데이트
     public Map<String, Object> updateUser(Long userId, User user) {
         int result = 0;
+        String nickname = user.getNickname();
+        String isAdmin = user.getIsAdmin();
+        String email = user.getEmail();
+        
+        System.out.println("user : " + nickname);
         // NOTE: 닉네임 중복 확인
-        if (userRepository.isEmailOrNicknameDuplicate("nickname", user.getNickname(), userId)) {
+        if (userRepository.isEmailOrNicknameDuplicate("nickname", nickname, userId)) {
             LoggerUtil.debug("Nickname is already in use.");
             return null;
         }
-        // 사용자 추가 로직
-        String decodedPassword = passwordUtil.decodeBase64(user.getPassword());
-        String encodedPassword = passwordUtil.encodePassword(decodedPassword);
-        user.setPassword(encodedPassword);
+        // NOTE: 사용자 추가 로직
+        if(user.getPassword() != null && !user.getPassword().equals("")) {
+	        String decodedPassword = passwordUtil.decodeBase64(user.getPassword());
+	        String encodedPassword = passwordUtil.encodePassword(decodedPassword);
+	        user.setPassword(encodedPassword);
+        }
+      
         result = userRepository.updateUser(userId, user);
         if (result > 0) {
             notificationRepository.save("UPDATE", "users", "사용자가 수정되었습니다.", "", userId, null);
         }
 
-        // Map 객체를 생성하여 반환
+        // NOTE: Map 객체를 생성하여 반환
         Map<String, Object> responseMap = new HashMap<>();
-        responseMap.put("token", encodedPassword);
+    	try {
+			String token = jwtUtil.generateToken(userId, email, isAdmin, nickname);
+			responseMap.put("token", token);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         return ResponseUtil.successResponse(responseMap);
     }
