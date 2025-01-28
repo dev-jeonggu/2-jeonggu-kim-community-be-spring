@@ -67,7 +67,7 @@ public class NotificationRepository {
 				INNER JOIN users u on b.user_id = u.user_id
 				WHERE IFNULL(n.is_read, 'N') = 'N'
 				AND n.request_module = 'boardview'
-				AND n.user_id = ?
+				AND b.user_id = ?
 				GROUP BY n.content, u.nickname, n.event_type, n.request_module, n.event_id;
         		""";
         
