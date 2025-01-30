@@ -15,6 +15,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -77,10 +79,12 @@ public class CommentRepository {
     }
     
     // NOTE : 댓글 수정
-    public int updateComment(Long commentId, String newContent, Long userId) {
-        String sql = "UPDATE comments SET content = ?, chg_dt = NOW() WHERE comment_id = ? and user_id = ?";
+    public int updateComment(Long commentId, String newContent, Long userId, LocalDateTime chgDt) {
+        String sql = "UPDATE comments SET content = ?, chg_dt = ? WHERE comment_id = ? and user_id = ?";
         
-        return jdbcTemplate.update(sql, newContent, commentId, userId);
+        Timestamp timestamp = Timestamp.valueOf(chgDt);
+
+        return jdbcTemplate.update(sql, newContent, timestamp, commentId, userId);
     }
 
     // NOTE : RowMapper
