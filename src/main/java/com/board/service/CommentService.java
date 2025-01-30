@@ -8,6 +8,7 @@ import com.board.repo.admin.NotificationRepository;
 import com.board.utils.ResponseUtil;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,12 +74,16 @@ public class CommentService {
     }
     
     // NOTE : 댓글 수정
-    public boolean updateComment(Long commentId, String newContent, Long userId) {
-        int result = commentRepository.updateComment(commentId, newContent, userId);
+    public Map<String, Object> updateComment(Long commentId, String newContent, Long userId) {
+    	 LocalDateTime now = LocalDateTime.now();
+    	int result = commentRepository.updateComment(commentId, newContent, userId, now);
+
         if(result > 0) {
+        	Map<String, Object> response = new HashMap<>();
+        	response.put("chg_dt", now);
             notificationRepository.save("UPDATE", "comments", "댓글이 수정되었습니다.", newContent, userId, commentId);
-            return true;
+            return response;
         }
-        return false;
+        return null;
     }
 }

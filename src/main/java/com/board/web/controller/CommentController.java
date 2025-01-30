@@ -13,6 +13,7 @@ import com.board.utils.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -84,8 +85,8 @@ public class CommentController {
     public ResponseEntity<?> updateComment(HttpServletRequest request, @PathVariable Long commentId, @RequestBody Map<String, String> requestBody) {
     	Long userId = JwtUtil.getUserIdFromSecurityContext();
         String newContent = requestBody.get("content");
-        boolean success = commentService.updateComment(commentId, newContent, userId);
-        return success ? ResponseEntity.ok("Comment updated successfully!")
+        Map<String, Object> map = commentService.updateComment(commentId, newContent, userId);
+        return map != null ? ResponseEntity.ok(ResponseUtil.successResponse(map))
                        : ResponseEntity.status(500).body("Failed to update comment.");
     }
 }
