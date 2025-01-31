@@ -1,8 +1,8 @@
 package com.board.service;
 
 import com.board.entity.User;
-import com.board.repo.UserRepository;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
+import com.board.repo_jdbc.UserRepository;
 import com.board.utils.LoggerUtil;
 import com.board.utils.PasswordUtil;
 import com.board.utils.ResponseUtil;

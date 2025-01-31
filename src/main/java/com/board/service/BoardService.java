@@ -3,9 +3,9 @@ package com.board.service;
 import com.board.dto.BoardListResponse;
 import com.board.dto.BoardRequest;
 import com.board.dto.BoardResponse;
-import com.board.repo.BoardRepository;
-import com.board.repo.CommentRepository;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
+import com.board.repo_jdbc.BoardRepository;
+import com.board.repo_jdbc.CommentRepository;
 import com.board.utils.LoggerUtil;
 import com.board.utils.ResponseUtil;
 
@@ -26,6 +26,7 @@ public class BoardService {
 	@Autowired
 	private NotificationRepository notificationRepository;
 
+	@Qualifier("jdbcBoardRepository")
 	private final BoardRepository boardRepository;
 	private final CommentRepository commentRepository;
 
