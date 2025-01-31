@@ -3,7 +3,7 @@ package com.board.service.admin;
 import org.springframework.stereotype.Service;
 
 import com.board.entity.admin.Notification;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
 
 import java.util.List;
 import java.util.Map;

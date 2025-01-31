@@ -2,9 +2,9 @@ package com.board.service;
 
 import com.board.dto.BoardListResponse;
 import com.board.entity.Comment;
-import com.board.repo.CommentRepository;
-import com.board.repo.UserRepository;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
+import com.board.repo_jdbc.CommentRepository;
+import com.board.repo_jdbc.UserRepository;
 import com.board.utils.ResponseUtil;
 
 import java.time.LocalDateTime;

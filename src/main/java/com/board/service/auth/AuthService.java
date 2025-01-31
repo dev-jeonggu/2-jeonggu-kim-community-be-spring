@@ -1,8 +1,8 @@
 package com.board.service.auth;
 
 import com.board.entity.User;
-import com.board.repo.UserRepository;
-import com.board.repo.auth.AuthRepository;
+import com.board.repo_jdbc.auth.AuthRepository;
+import com.board.repo_jdbc.UserRepository;
 import com.board.utils.JwtUtil;
 import com.board.utils.PasswordUtil;
 
