@@ -1,7 +1,7 @@
-package com.board.repo;
+package com.board.repo_jdbc;
 
 import com.board.entity.User;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,14 +24,14 @@ public class UserRepository {
     private JdbcTemplate jdbcTemplate;
     
     // NOTE :사용자 조회
-    public List<User> findUserByKeyAndValue(String key, String value, Long userId) {
+    public List<Map<String,Object>> findUserByKeyAndValue(String key, String value, Long userId) {
         String sql = "SELECT user_id, email, password, nickname, profile_url, ifnull(is_admin,'N') AS isAdmin FROM users WHERE " +
                      key + " = ? " +
                      (userId != null ? "AND user_id != ? " : "");
         
         Object[] params = userId != null ? new Object[]{value, userId} : new Object[]{value};
 
-        List<User> users = jdbcTemplate.query(sql, params, new UserRowMapper());
+        List<Map<String,Object>> users = jdbcTemplate.queryForList(sql, params);
         return users;
     }
     
@@ -107,19 +107,4 @@ public class UserRepository {
         Integer count = jdbcTemplate.queryForObject(sql, params, Integer.class);
         return count != null && count > 0;
     }
-    
-    // NOTE : RowMapper 구현
-    private static class UserRowMapper implements RowMapper<User> {
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            User user = new User();
-            user.setId(rs.getLong("user_id"));
-            user.setEmail(rs.getString("email"));
-            user.setPassword(rs.getString("password"));
-            user.setNickname(rs.getString("nickname"));
-            user.setProfileUrl(rs.getString("profile_url"));
-            return user;
-        }
-    }
-
 }

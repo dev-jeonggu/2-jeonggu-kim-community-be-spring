@@ -1,4 +1,4 @@
-package com.board.repo.auth;
+package com.board.repo_jdbc.auth;
 
 import com.board.entity.User;
 

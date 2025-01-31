@@ -1,4 +1,4 @@
-package com.board.repo.admin;
+package com.board.repo_jdbc.admin;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -93,9 +93,9 @@ public class NotificationRepository {
     }
     
     // NOTE : 읽지 않은 알림 조회
-    public List<Notification> findUnreadByUserId(Long userId) {
+    public List<Map<String, Object>> findUnreadByUserId(Long userId) {
         String sql = "SELECT * FROM notifications WHERE user_id = ? AND is_read = 0";
-        return jdbcTemplate.query(sql, new NotificationRowMapper(), userId);
+        return jdbcTemplate.queryForList(sql, userId);
     }
 
     // NOTE : 알림 읽음 처리
@@ -114,21 +114,5 @@ public class NotificationRepository {
         String sql = "UPDATE notifications SET is_admin_read = 'Y', chg_dt = NOW() WHERE notification_id IN (" + inClause + ")";
 
         return jdbcTemplate.update(sql, idList.toArray());
-    }
-    
-    // NOTE : 알림 데이터 매핑
-    private static class NotificationRowMapper implements RowMapper<Notification> {
-        @Override
-        public Notification mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Notification notification = new Notification();
-            notification.setNotificationId(rs.getLong("notification_id"));
-            notification.setEventType(rs.getString("event_type"));
-            notification.setContent(rs.getString("content"));
-            notification.setUserId(rs.getLong("user_id"));
-            notification.setIsRead(rs.getString("is_read"));
-            notification.setRegDt(rs.getTimestamp("reg_dt") != null ? rs.getTimestamp("reg_dt").toLocalDateTime() : null);
-            notification.setChgDt(rs.getTimestamp("chg_dt") != null ? rs.getTimestamp("chg_dt").toLocalDateTime() : null);
-            return notification;
-        }
     }
 }
