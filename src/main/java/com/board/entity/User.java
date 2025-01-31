@@ -1,80 +1,52 @@
 package com.board.entity;
 
-import java.time.LocalDateTime;
+import javax.persistence.*;
+import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EntityListeners(AuditingEntityListener.class) // Auditing 기능 활성화
+@Table(name = "users") // 데이터베이스 테이블 이름
 public class User {
 
-    private Long id; // user_id
-    private String email;
-    private String password;
-    private String nickname;
-    private String profileUrl;
-    private LocalDateTime regDt; // 등록일시
-    private LocalDateTime chgDt; // 수정일시
-    private String isAdmin;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT 매핑
+    @Column(name = "user_id")
+    private Long userId; // 기본 키 (user_id)
 
-    public String getIsAdmin() {
-		return isAdmin;
-	}
+    @Column(nullable = false, unique = true, length = 100)
+    private String email; // 이메일 (유니크)
 
-	public void setIsAdmin(String isAdmin) {
-		this.isAdmin = isAdmin;
-	}
+    @Column(nullable = false, length = 255)
+    private String password; // 비밀번호
 
-	// Getters and Setters
-    public Long getId() {
-        return id;
-    }
+    @Column(nullable = false, length = 50)
+    private String nickname; // 닉네임
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @Column(name = "profile_url", length = 500)
+    private String profileUrl; // 프로필 URL
 
-    public String getEmail() {
-        return email;
-    }
+    @CreatedDate
+    @Column(name = "reg_dt", nullable = false, updatable = false)
+    private LocalDateTime regDt; // 등록 일시
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @LastModifiedDate
+    @Column(name = "chg_dt")
+    private LocalDateTime chgDt; // 수정 일시
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public String getProfileUrl() {
-        return profileUrl;
-    }
-
-    public void setProfileUrl(String profileUrl) {
-        this.profileUrl = profileUrl;
-    }
+    @Column(name = "is_admin", nullable = false)
+    private String isAdmin; // 관리자 여부
     
-    public LocalDateTime getRegDt() {
-        return regDt;
-    }
-
-    public void setRegDt(LocalDateTime regDt) {
-        this.regDt = regDt;
-    }
-    
-    public LocalDateTime getChgDt() {
-        return chgDt;
-    }
-
-    public void setChgDt(LocalDateTime chgDt) {
-        this.chgDt = chgDt;
-    }
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Board> boards;
 }
