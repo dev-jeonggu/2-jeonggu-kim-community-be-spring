@@ -1,7 +1,7 @@
-package com.board.repo;
+package com.board.repo_jdbc;
 
 import com.board.entity.Board;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
 
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 
-@Repository
+@Repository("jdbcBoardRepository")
 public class BoardRepository {
 	private final JdbcTemplate jdbcTemplate;
 
@@ -177,5 +177,33 @@ public class BoardRepository {
         }
         
         return jdbcTemplate.queryForMap(sql, userId, boardId, boardId);
+    }
+    
+    // NOTE : 좋아요 기능
+    public boolean isBoardExists(Long boardId) {
+        String query = "SELECT COUNT(*) FROM boards WHERE board_id = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, boardId);
+        return count != null && count > 0;
+    }
+
+    public boolean isLikeExists(Long boardId, Long userId) {
+        String query = "SELECT COUNT(*) FROM likes WHERE board_id = ? AND user_id = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, boardId, userId);
+        return count != null && count > 0;
+    }
+
+    public void addLike(Long boardId, Long userId) {
+        String query = "INSERT INTO likes (board_id, user_id, reg_dt) VALUES (?, ?, NOW())";
+        jdbcTemplate.update(query, boardId, userId);
+    }
+
+    public void removeLike(Long boardId, Long userId) {
+        String query = "DELETE FROM likes WHERE board_id = ? AND user_id = ?";
+        jdbcTemplate.update(query, boardId, userId);
+    }
+
+    public int getLikeCount(Long boardId) {
+        String query = "SELECT COUNT(*) FROM likes WHERE board_id = ?";
+        return jdbcTemplate.queryForObject(query, Integer.class, boardId);
     }
 }

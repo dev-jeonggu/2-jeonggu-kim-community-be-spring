@@ -1,8 +1,8 @@
-package com.board.repo;
+package com.board.repo_jdbc;
 
 import com.board.entity.Comment;
 import com.board.entity.User;
-import com.board.repo.admin.NotificationRepository;
+import com.board.repo_jdbc.admin.NotificationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -85,24 +85,5 @@ public class CommentRepository {
         Timestamp timestamp = Timestamp.valueOf(chgDt);
 
         return jdbcTemplate.update(sql, newContent, timestamp, commentId, userId);
-    }
-
-    // NOTE : RowMapper
-    private static class CommentRowMapper implements RowMapper<Comment> {
-        @Override
-        public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Comment comment = new Comment();
-            comment.setBoardId(rs.getLong("board_id"));
-            comment.setProfileUrl(rs.getString("profile_url"));
-            comment.setNickname(rs.getString("nickname"));
-            comment.setCommentId(rs.getLong("comment_id"));
-            comment.setContent(rs.getString("content"));
-            comment.setUserId(rs.getLong("user_id"));
-            comment.setRegDt(rs.getTimestamp("reg_dt") != null ? rs.getTimestamp("reg_dt").toLocalDateTime() : null);
-        	comment.setChgDt(rs.getTimestamp("chg_dt") != null ? rs.getTimestamp("chg_dt").toLocalDateTime() : null);
-            comment.setAuthor(rs.getBoolean("is_author"));
-            comment.setChanged(rs.getBoolean("is_changed"));
-            return comment;
-        }
     }
 }
