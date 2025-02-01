@@ -48,4 +48,8 @@ public class Board {
     private String imageNm;
 
     // Getters and Setters
+    @Transient  // JPA가 이 필드를 DB 필드로 취급하지 않음
+    public Long getUserId() {
+        return user != null ? user.getUserId() : null;
+    }
 }
