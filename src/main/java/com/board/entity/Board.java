@@ -48,4 +48,7 @@ public class Board {
     private String imageNm;
 
     // Getters and Setters
+    public Long getUserId() {
+        return user != null ? user.getUserId() : null;
+    }
 }
