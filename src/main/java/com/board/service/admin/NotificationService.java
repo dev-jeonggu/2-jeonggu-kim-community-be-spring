@@ -33,7 +33,7 @@ public class NotificationService {
     }
     
     // 읽지 않은 알림 조회
-    public List<Notification> getUnreadNotifications(Long userId) {
+    public List<Map<String,Object>> getUnreadNotifications(Long userId) {
         return notificationRepository.findUnreadByUserId(userId);
     }
 

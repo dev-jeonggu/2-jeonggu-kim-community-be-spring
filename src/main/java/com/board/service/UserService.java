@@ -37,7 +37,7 @@ public class UserService {
 
     // NOTE : 사용자 조회
     public Map<String, Object> findUser(String key, String value, Long userId) {
-        List<User> user = userRepository.findUserByKeyAndValue(key, value, userId);
+        List<Map<String,Object>> user = userRepository.findUserByKeyAndValue(key, value, userId);
         Map<String, Object> innerResponse = new HashMap<>();
 
         if (user.isEmpty()) {

@@ -52,7 +52,7 @@ public class NotificationController {
 
     // NOTE : 읽지 않은 알림 조회 API
     @GetMapping("/unread/{userId}")
-    public ResponseEntity<List<Notification>> getUnreadNotifications(@PathVariable Long userId) {
+    public ResponseEntity<List<Map<String,Object>>> getUnreadNotifications(@PathVariable Long userId) {
         return ResponseEntity.ok(notificationService.getUnreadNotifications(userId));
     }
 
