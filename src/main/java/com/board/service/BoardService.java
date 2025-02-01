@@ -12,6 +12,7 @@ import com.board.utils.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +64,29 @@ public class BoardService {
 		}
 	}
 
+
+	// NOTE : 좋아요 추가
+	// ADD : 추후에 해당 부분 알림 추가
+	public Map<String, Object> likeBoard(Long userId, Long boardId) {
+        if (!boardRepository.isBoardExists(boardId)) {
+            throw new IllegalArgumentException("Board does not exist.");
+        }
+
+        boolean isLikeExists = boardRepository.isLikeExists(boardId, userId);
+        if (isLikeExists) {
+        	boardRepository.removeLike(boardId, userId);
+        } else {
+        	boardRepository.addLike(boardId, userId);
+        }
+
+        int likeCount = boardRepository.getLikeCount(boardId);
+        Map<String, Object> response = new HashMap<>();
+        response.put("like_cnt", likeCount);
+        response.put("liked", !isLikeExists);
+        
+        return ResponseUtil.successResponse(response);
+	}
+	
 	// NOTE : 게시글 상세 조회
 	public Map<String, Object> getBoardInfo(Long boardId, Long userId, String url) {
 		Map<String, Object> board = boardRepository.findById(boardId, userId, url);
