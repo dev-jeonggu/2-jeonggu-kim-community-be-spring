@@ -63,6 +63,18 @@ public class BoardController {
         }
     }
 
+    @PostMapping("/like")
+    public ResponseEntity<?> likeBoard(HttpServletRequest request, @RequestBody Map<String, Object> requestBody) {
+        try {
+        	Long userId = JwtUtil.getUserIdFromSecurityContext();
+        	Long boardId = ((Number) requestBody.get("board_id")).longValue();
+        	Map<String, Object> response = boardService.likeBoard(userId, boardId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding board post");
+        }
+    }
+    
     @GetMapping("/{boardId}")
     public ResponseEntity<?> getBoardInfo(@PathVariable Long boardId, HttpServletRequest request) {
         try {
