@@ -3,40 +3,20 @@ package com.board.dto;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Map;
-
-import com.board.entity.Board;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BoardResponse {
-    private Long boardId;
-    private String title;
-    private String content;
-    private String email;
-    private String imageUrl;
-    private String imageNm;
-    private LocalDateTime regDt;
-    private LocalDateTime chgDt;
 
-    public BoardResponse(Board board) {
-        this.boardId = board.getBoardId();
-        this.title = board.getTitle();
-        this.content = board.getContent();
-        this.email = board.getEmail();
-        this.imageUrl = board.getImageUrl();
-        this.imageNm = board.getImageNm();
-        this.regDt = board.getRegDt();
-        this.chgDt = board.getChgDt();
-    }
-
-	public BoardResponse(String string) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public BoardResponse(Map<String, Object> board) {
-		// TODO Auto-generated constructor stub
-	}
+    private Long boardId;         // 게시글 ID
+    private String title;         // 제목
+    private String content;       // 내용
+    private Long userId;          // 작성자 ID
+    private String imageUrl;      // 이미지 URL
+    private String imageNm;       // 이미지 이름
+    private LocalDateTime regDt;  // 등록 일시
+    private LocalDateTime chgDt;  // 수정 일시
 }
