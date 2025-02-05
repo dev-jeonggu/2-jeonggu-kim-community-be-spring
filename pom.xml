@@ -42,6 +42,11 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+	        <groupId>javax.persistence</groupId>
+	        <artifactId>javax.persistence-api</artifactId>
+	        <version>2.2</version>
+	    </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
@@ -49,6 +54,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+    		<version>3.0.0</version> <!-- 버전 확인 -->
             <scope>test</scope>
         </dependency>
         <dependency>
