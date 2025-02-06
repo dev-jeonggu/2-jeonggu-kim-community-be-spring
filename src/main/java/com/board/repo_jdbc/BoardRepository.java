@@ -24,6 +24,7 @@ public class BoardRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // NOTE : 특정 게시글을 가져오기 때문에 count(*)이 더 효율적
     public Map<String, Object> getBoardById(Long boardId) {
     	String sql = """
     		    SELECT b.board_id, b.title, b.content AS boardContent, b.reg_dt AS date, b.user_id, b.image_url,
@@ -63,13 +64,23 @@ public class BoardRepository {
 
     public List<Map<String, Object>> getBoardList(int offset, int limit) {
         String sql = """
-            SELECT b.board_id, b.title, b.reg_dt AS date, b.user_id, u.nickname, u.profile_url,
-                   (SELECT COUNT(*) FROM likes WHERE board_id = b.board_id) AS like_cnt,
-                   (SELECT COUNT(*) FROM comments WHERE board_id = b.board_id) AS comment_cnt,
-                   (SELECT COUNT(*) FROM boardview WHERE board_id = b.board_id) AS view_cnt
-            FROM boards b
-            INNER JOIN users u ON b.user_id = u.user_id
-            ORDER BY b.reg_dt desc
+			SELECT 
+			    b.board_id, 
+			    b.title, 
+			    b.reg_dt AS date, 
+			    b.user_id, 
+			    u.nickname, 
+			    u.profile_url,
+			    COUNT(DISTINCT l.like_id) AS like_cnt,
+			    COUNT(DISTINCT c.comment_id) AS comment_cnt,
+			    COUNT(DISTINCT v.view_id) AS view_cnt
+			FROM boards b
+			LEFT JOIN users u ON b.user_id = u.user_id
+			LEFT JOIN likes l ON b.board_id = l.board_id
+			LEFT JOIN comments c ON b.board_id = c.board_id
+			LEFT JOIN boardview v ON b.board_id = v.board_id
+			GROUP BY b.board_id
+			ORDER BY b.reg_dt desc
             LIMIT ?, ?
         """;
         return jdbcTemplate.queryForList(sql, offset, limit);
@@ -113,11 +124,14 @@ public class BoardRepository {
                 b.user_id AS user_id,
                 u.nickname,
                 u.profile_url,
-                (SELECT COUNT(*) FROM likes WHERE board_id = b.board_id) AS like_cnt,
-                (SELECT COUNT(*) FROM comments WHERE board_id = b.board_id) AS comment_cnt,
-                (SELECT COUNT(*) FROM boardview WHERE board_id = b.board_id) AS view_cnt
+			    COUNT(DISTINCT l.like_id) AS like_cnt,
+			    COUNT(DISTINCT c.comment_id) AS comment_cnt,
+			    COUNT(DISTINCT v.view_id) AS view_cnt
             FROM boards b
-            INNER JOIN users u ON b.user_id = u.user_id
+			LEFT JOIN users u ON b.user_id = u.user_id
+			LEFT JOIN likes l ON b.board_id = l.board_id
+			LEFT JOIN comments c ON b.board_id = c.board_id
+			LEFT JOIN boardview v ON b.board_id = v.board_id
             %s
             ORDER BY b.reg_dt DESC
             LIMIT ? OFFSET ?
