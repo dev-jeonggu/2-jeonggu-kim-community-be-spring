@@ -78,10 +78,10 @@ public class BoardController {
     @GetMapping("/{boardId}")
     public ResponseEntity<?> getBoardInfo(@PathVariable Long boardId, HttpServletRequest request) {
         try {
-            // JWT에서 사용자 ID 가져오기
+            // NOTE : JWT에서 사용자 ID 가져오기
             Long userId = JwtUtil.getUserIdFromSecurityContext();
             
-            // Header에서 CurrentPage 가져오기
+            // NOTE : Header에서 CurrentPage 가져오기
             String referrer = request.getHeader("CurrentPage");
             String url = "";
             if (referrer != null && !referrer.equals("")) {
@@ -93,7 +93,7 @@ public class BoardController {
                 }
             }
             
-            // 게시글 정보 가져오기
+            // NOTE : 게시글 정보 가져오기
             Map<String, Object> response = boardService.getBoardInfo(boardId, userId, url);
 
             return ResponseEntity.ok(response);
