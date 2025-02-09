@@ -110,7 +110,8 @@ public class BoardRepository {
     }
 
     public List<Map<String, Object>> findAllBySearch(String searchKey, String searchValue, int offset, int limit) {
-        // 기본적으로 조건이 없으면 모든 게시글 조회
+        System.out.println(offset + " " + limit);
+
         String whereClause = (searchKey != null && !searchKey.isEmpty() && searchValue != null && !searchValue.isEmpty())
                 ? "WHERE " + searchKey + " LIKE ?"
                 : "";
@@ -124,14 +125,20 @@ public class BoardRepository {
                 b.user_id AS user_id,
                 u.nickname,
                 u.profile_url,
-			    COUNT(DISTINCT l.like_id) AS like_cnt,
-			    COUNT(DISTINCT c.comment_id) AS comment_cnt,
-			    COUNT(DISTINCT v.view_id) AS view_cnt
+                IFNULL(l.like_cnt, 0) AS like_cnt,
+                IFNULL(c.comment_cnt, 0) AS comment_cnt,
+                IFNULL(v.view_cnt, 0) AS view_cnt
             FROM boards b
-			LEFT JOIN users u ON b.user_id = u.user_id
-			LEFT JOIN likes l ON b.board_id = l.board_id
-			LEFT JOIN comments c ON b.board_id = c.board_id
-			LEFT JOIN boardview v ON b.board_id = v.board_id
+            LEFT JOIN users u ON b.user_id = u.user_id
+            LEFT JOIN (
+                SELECT board_id, COUNT(*) AS like_cnt FROM likes GROUP BY board_id
+            ) l ON b.board_id = l.board_id
+            LEFT JOIN (
+                SELECT board_id, COUNT(*) AS comment_cnt FROM comments GROUP BY board_id
+            ) c ON b.board_id = c.board_id
+            LEFT JOIN (
+                SELECT board_id, COUNT(*) AS view_cnt FROM boardview GROUP BY board_id
+            ) v ON b.board_id = v.board_id
             %s
             ORDER BY b.reg_dt DESC
             LIMIT ? OFFSET ?
@@ -139,15 +146,14 @@ public class BoardRepository {
 
         List<Object> params = new ArrayList<>();
         if (!whereClause.isEmpty()) {
-            params.add("%" + searchValue + "%"); 
+            params.add("%" + searchValue + "%");
         }
-        params.add(limit + 1); 
+        params.add(limit);
         params.add(offset);
 
-        List<Map<String, Object>> boards = jdbcTemplate.queryForList(sql, params.toArray());
-
-        return boards;
+        return jdbcTemplate.queryForList(sql, params.toArray());
     }
+
     
     public Map<String, Object> findById(Long boardId, Long userId, String url) {
         String sql = """
