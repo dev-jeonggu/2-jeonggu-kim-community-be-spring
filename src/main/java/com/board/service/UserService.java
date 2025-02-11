@@ -62,19 +62,19 @@ public class UserService {
     
     // NOTE : 사용자 추가
     public boolean addUser(User user) {
-        // 이메일 중복 확인
+        // NOTE : 이메일 중복 확인
         if (userRepository.isEmailOrNicknameDuplicate("email", user.getEmail(), null)) {
             LoggerUtil.debug("Email is already in use.");
             return false;
         }
 
-        // 닉네임 중복 확인
+        // NOTE : 닉네임 중복 확인
         if (userRepository.isEmailOrNicknameDuplicate("nickname", user.getNickname(), null)) {
             LoggerUtil.debug("Nickname is already in use.");
             return false;
         }
 
-        // 사용자 추가 로직
+        // NOTE : 사용자 추가 로직
         String decodedPassword = passwordUtil.decodeBase64(user.getPassword());
         String encodedPassword = passwordUtil.encodePassword(decodedPassword);
         user.setPassword(encodedPassword);
