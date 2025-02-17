@@ -8,6 +8,7 @@ import com.board.utils.PasswordUtil;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,6 +34,7 @@ public class AuthService {
     public Map<String, Object> login(String email, String password) {
         try {
             Map<String, Object> user = authRepository.findByEmail(email);
+        long startTime = System.currentTimeMillis();
 
             if (user != null && !user.isEmpty()) {
             	String decodedPassword = passwordUtil.decodeBase64(password);
@@ -69,6 +71,10 @@ public class AuthService {
             }
         } catch (Exception e) {
             throw new RuntimeException("로그인 처리 중 오류가 발생했습니다.", e);
+        } finally {
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            System.out.println("[Execution Time] AuthService.login() 실행 시간: " + executionTime + "ms");
         }
     }
 }
