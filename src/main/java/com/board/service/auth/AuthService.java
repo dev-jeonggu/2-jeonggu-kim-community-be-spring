@@ -7,10 +7,10 @@ import com.board.utils.JwtUtil;
 import com.board.utils.PasswordUtil;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,20 +22,29 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final BCryptPasswordEncoder passwordEncoder; // NOTE : 비밀번호 검증용
     private final PasswordUtil passwordUtil;
-
+    private final RedisTemplate<String, Object> redisTemplate;
+    
     @Autowired
-    public AuthService(AuthRepository authRepository, JwtUtil jwtUtil, PasswordUtil passwordUtil) {
+    public AuthService(AuthRepository authRepository, JwtUtil jwtUtil, PasswordUtil passwordUtil, RedisTemplate<String, Object> redisTemplate) {
         this.authRepository = authRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.passwordUtil = passwordUtil;
+        this.redisTemplate = redisTemplate;
     }
 
     public Map<String, Object> login(String email, String password) {
-        try {
-            Map<String, Object> user = authRepository.findByEmail(email);
         long startTime = System.currentTimeMillis();
+        
+    	try {
+        	String cacheKey = "user:" + email;
+            Map<String, Object> user = (Map<String, Object>) redisTemplate.opsForValue().get(cacheKey);
 
+            if (user == null) {
+                user = authRepository.findByEmail(email);
+                redisTemplate.opsForValue().set(cacheKey, user, 10, TimeUnit.MINUTES);
+            }
+            
             if (user != null && !user.isEmpty()) {
             	String decodedPassword = passwordUtil.decodeBase64(password);
             	String encodedPassword = (String) user.get("password");
