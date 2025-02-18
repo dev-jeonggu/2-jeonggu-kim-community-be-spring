@@ -110,8 +110,6 @@ public class BoardRepository {
     }
 
     public List<Map<String, Object>> findAllBySearch(String searchKey, String searchValue, int offset, int limit) {
-        System.out.println(offset + " " + limit);
-
         String whereClause = (searchKey != null && !searchKey.isEmpty() && searchValue != null && !searchValue.isEmpty())
                 ? "WHERE " + searchKey + " LIKE ?"
                 : "";
