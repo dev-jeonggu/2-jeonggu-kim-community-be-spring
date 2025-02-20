@@ -15,32 +15,32 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    //private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // 랜덤 키 생성
-	//private final String SECRET_KEY = "your-256-bit-secret-your-256-bit-secret"; // 최소 256비트
-	private final String SECRET_KEY = "your-256-bit-secret-your-256-bit-secret"; // 최소 256비트
-	private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    // NOTE :private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // NOTE : 랜덤 키 생성
+    // NOTE :private final String SECRET_KEY = "your-256-bit-secret-your-256-bit-secret"; // NOTE : 최소 256비트
+    private final String SECRET_KEY = "your-256-bit-secret-your-256-bit-secret"; // NOTE : 최소 256비트
+    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 	
-    private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1시간
+    private final long EXPIRATION_TIME = 1000 * 60 * 60; // NOTE : 1시간
 
-    // JWT 생성 메서드
+    // NOTE : JWT 생성 메서드
     public String generateToken(Long userId, String email, String isAdmin, String nickname) {
     	String jwt = Jwts.builder()
-                .setSubject(email) // 이메일을 주제로 설정
-                .claim("userId", userId) // user_id를 클레임에 추가
-                .claim("isAdmin", isAdmin) // user_id를 클레임에 추가
-                .claim("nickname", nickname) // user_id를 클레임에 추가
-                .setIssuedAt(new Date()) // 발행 시간
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // 만료 시간
-                .signWith(key) // 서명
+                .setSubject(email) // NOTE : 이메일을 주제로 설정
+                .claim("userId", userId) // NOTE : user_id를 클레임에 추가
+                .claim("isAdmin", isAdmin) // NOTE : user_id를 클레임에 추가
+                .claim("nickname", nickname) // NOTE : user_id를 클레임에 추가
+                .setIssuedAt(new Date()) // NOTE : 발행 시간
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // NOTE : 만료 시간
+                .signWith(key) // NOTE : 서명
                 .compact();
     	return jwt;
     }
 
-    // JWT 검증 및 클레임 파싱 메서드
+    // NOTE : JWT 검증 및 클레임 파싱 메서드
     public Claims validateToken(String token) {
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(key) // 서명 키 설정
+                    .setSigningKey(key) // NOTE : 서명 키 설정
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
@@ -63,7 +63,7 @@ public class JwtUtil {
         	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userDetails.getId();
         }
-        return null;  // 인증 정보가 없을 경우 null 반환
+        return null;  // NOTE : 인증 정보가 없을 경우 null 반환
     }
     
     public static String getIsAdminFromSecurityContext() {
@@ -72,7 +72,7 @@ public class JwtUtil {
         	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userDetails.getIsAdmin();
         }
-        return null;  // 인증 정보가 없을 경우 null 반환
+        return null;  // NOTE : 인증 정보가 없을 경우 null 반환
     }
     
     public static String getNicknameFromSecurityContext() {
@@ -81,7 +81,7 @@ public class JwtUtil {
         	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userDetails.getNickname();
         }
-        return null;  // 인증 정보가 없을 경우 null 반환
+        return null;  // NOTE : 인증 정보가 없을 경우 null 반환
     }
     
     public static String getEmailFromSecurityContext() {
@@ -90,6 +90,6 @@ public class JwtUtil {
         	JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             return userDetails.getEmail();
         }
-        return null;  // 인증 정보가 없을 경우 null 반환
+        return null;  // NOTE : 인증 정보가 없을 경우 null 반환
     }
 }
