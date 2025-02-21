@@ -1,0 +1,23 @@
+version: '3.1'
+services:
+
+  2-jeonggu-community-be-spring:
+    build: .
+    container_name: 2-jeonggu-community-be-spring
+    ports:
+      - "18080:8080"
+      - "18787:8787"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+volumes:
+  redis_data:
